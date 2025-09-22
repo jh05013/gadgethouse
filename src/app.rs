@@ -14,6 +14,9 @@ impl MyApp {
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
         cc.egui_ctx.set_visuals(egui::Visuals::light());
 
+        // image loader
+        egui_extras::install_image_loaders(&cc.egui_ctx);
+
         Default::default()
     }
 

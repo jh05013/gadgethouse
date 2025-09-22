@@ -1,4 +1,4 @@
-use egui::{vec2, RichText};
+use egui::{RichText, vec2};
 
 use super::HouseGadget;
 use std::fmt::Write;
@@ -137,7 +137,7 @@ impl CipherMode {
             Self::Morse => &MORSE,
             Self::Semaphore => &SEMAPHORE,
             Self::Ternary => &TERNARY,
-            _ => unreachable!("{self:?} doesn't support wildcards")
+            _ => unreachable!("{self:?} doesn't support wildcards"),
         }
     }
 
@@ -168,7 +168,7 @@ impl CipherCriterion {
             (Self::No, _) => '✖',
             (_, CipherMode::Braille) => '⏺',
             (_, CipherMode::Semaphore) => '🚩',
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -178,19 +178,27 @@ impl CipherCriterion {
             return false;
         }
 
-        let choice = if exact && matches!(self, Self::Blank) { Self::No } else {
+        let choice = if exact && matches!(self, Self::Blank) {
+            Self::No
+        } else {
             *self
         };
-        matches!((ans, choice),
-            (_, Self::Blank) |
-            ('0', Self::No) | ('1', Self::Yes) | ('2', Self::Two)
+        matches!(
+            (ans, choice),
+            (_, Self::Blank) | ('0', Self::No) | ('1', Self::Yes) | ('2', Self::Two)
         )
     }
 
     fn left_click(&mut self, mode: CipherMode) {
         *self = match self {
             Self::Blank | Self::No => Self::Yes,
-            Self::Yes => if mode.has_two() { Self::Two } else { Self::Blank },
+            Self::Yes => {
+                if mode.has_two() {
+                    Self::Two
+                } else {
+                    Self::Blank
+                }
+            }
             Self::Two => Self::Blank,
         };
     }
@@ -213,9 +221,10 @@ pub struct Cipher {
 impl Cipher {
     fn match_letter(&self, num: usize, exact: bool) -> bool {
         let answer = self.mode.answer_list()[num];
-        answer.chars().zip(&self.criteria).all(|(ans, crit)| {
-            crit.matches(ans, exact)
-        })
+        answer
+            .chars()
+            .zip(&self.criteria)
+            .all(|(ans, crit)| crit.matches(ans, exact))
     }
 
     fn match_result(&self, exact: bool) -> impl Iterator<Item = char> + '_ {
@@ -291,13 +300,16 @@ impl Cipher {
                 warn_oob = true;
                 continue;
             }
-            let letter = LETTERS.as_bytes()[num-1] as char;
+            let letter = LETTERS.as_bytes()[num - 1] as char;
             write!(&mut answer, "{letter} ").unwrap();
         }
 
         ui.label(answer);
         if warn_oob {
-            ui.label(RichText::new("⚠ There is an out-of-bound number").color(ui.visuals().warn_fg_color));
+            ui.label(
+                RichText::new("⚠ There is an out-of-bound number")
+                    .color(ui.visuals().warn_fg_color),
+            );
         }
     }
 

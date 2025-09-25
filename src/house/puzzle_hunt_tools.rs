@@ -1,8 +1,8 @@
 use egui::{RichText, vec2};
 
 use super::HouseGadget;
-use std::fmt::Write;
-use strum::IntoEnumIterator;
+use std::fmt::Write as _;
+use strum::IntoEnumIterator as _;
 use strum_macros::EnumIter;
 
 const LETTERS: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#0123456789";
@@ -86,7 +86,7 @@ impl Indexing {
             .map(|num| num.parse::<usize>())
             .collect::<Result<Vec<_>, _>>()
         else {
-            return (input_length, INDEXING_WHITESPACE_ERR.to_string());
+            return (input_length, INDEXING_WHITESPACE_ERR.to_owned());
         };
 
         let Some(extracted) = indices
@@ -101,7 +101,7 @@ impl Indexing {
             })
             .collect::<Option<String>>()
         else {
-            return (input_length, OOB_ERR.to_string());
+            return (input_length, OOB_ERR.to_owned());
         };
 
         (input_length, extracted.to_uppercase())
@@ -137,7 +137,7 @@ impl CipherMode {
             Self::Morse => &MORSE,
             Self::Semaphore => &SEMAPHORE,
             Self::Ternary => &TERNARY,
-            _ => unreachable!("{self:?} doesn't support wildcards"),
+            Self::A1Z26 => unreachable!("{self:?} doesn't support wildcards"),
         }
     }
 
@@ -158,13 +158,11 @@ impl CipherCriterion {
     fn label(&self, mode: CipherMode) -> char {
         match (self, mode) {
             (Self::Blank, _) => ' ',
-            (Self::Yes, CipherMode::Binary) => '1',
-            (Self::No, CipherMode::Binary) => '0',
+            (Self::No, CipherMode::Binary | CipherMode::Ternary) => '0',
+            (Self::Yes, CipherMode::Binary | CipherMode::Ternary) => '1',
+            (Self::Two, CipherMode::Ternary) => '2',
             (Self::Two, CipherMode::Morse) => '—',
             (Self::Yes, CipherMode::Morse) => '⚫',
-            (Self::Two, CipherMode::Ternary) => '2',
-            (Self::Yes, CipherMode::Ternary) => '1',
-            (Self::No, CipherMode::Ternary) => '0',
             (Self::No, _) => '✖',
             (_, CipherMode::Braille) => '⏺',
             (_, CipherMode::Semaphore) => '🚩',
@@ -239,8 +237,8 @@ impl Cipher {
         &mut self,
         ui: &mut egui::Ui,
         name: &str,
-        newlines: Vec<usize>,
-        special_labels: Vec<(usize, char)>,
+        newlines: &[usize],
+        special_labels: &[(usize, char)],
     ) {
         let total = newlines.last().unwrap() + 1;
         egui::Grid::new(name).show(ui, |ui| {
@@ -314,26 +312,26 @@ impl Cipher {
     }
 
     fn ui_binary(&mut self, ui: &mut egui::Ui) {
-        self.ui_with_wildcard(ui, "Binary", vec![4], vec![]);
+        self.ui_with_wildcard(ui, "Binary", &[4], &[]);
     }
 
     fn ui_braille(&mut self, ui: &mut egui::Ui) {
-        self.ui_with_wildcard(ui, "Braille", vec![1, 3, 5], vec![]);
+        self.ui_with_wildcard(ui, "Braille", &[1, 3, 5], &[]);
         ui.checkbox(&mut self.use_numbers, "Use numbers");
     }
 
     fn ui_morse(&mut self, ui: &mut egui::Ui) {
-        self.ui_with_wildcard(ui, "Morse", vec![4], vec![]);
+        self.ui_with_wildcard(ui, "Morse", &[4], &[]);
         ui.checkbox(&mut self.use_numbers, "Use numbers");
     }
 
     fn ui_semaphore(&mut self, ui: &mut egui::Ui) {
-        self.ui_with_wildcard(ui, "Semaphore", vec![2, 4, 7], vec![(3, '☃')]);
+        self.ui_with_wildcard(ui, "Semaphore", &[2, 4, 7], &[(3, '☃')]);
         ui.checkbox(&mut self.use_numbers, "Use numbers");
     }
 
     fn ui_ternary(&mut self, ui: &mut egui::Ui) {
-        self.ui_with_wildcard(ui, "Ternary", vec![2], vec![]);
+        self.ui_with_wildcard(ui, "Ternary", &[2], &[]);
     }
 }
 
@@ -405,7 +403,7 @@ impl HouseGadget for PuzzleHuntTools {
     }
 
     fn title(&self) -> String {
-        "Puzzlehunt Tools".to_string()
+        "Puzzlehunt Tools".to_owned()
     }
 
     fn ui(&mut self, ui: &mut egui::Ui) {

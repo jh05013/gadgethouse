@@ -19,7 +19,7 @@ impl HouseGadget for EmojiPicker {
     }
 
     fn title(&self) -> String {
-        "Emoji".to_string()
+        "Emoji".to_owned()
     }
 
     fn ui(&mut self, ui: &mut egui::Ui) {

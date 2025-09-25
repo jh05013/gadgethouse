@@ -1,4 +1,4 @@
-use crate::house::*;
+use crate::house::{HouseGadget, register_gadgets};
 use egui::Id;
 
 fn setup_custom_fonts(ctx: &egui::Context) {

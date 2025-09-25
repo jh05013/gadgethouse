@@ -1,7 +1,7 @@
 [package]
-name = "eframe_template"
+name = "gadgethouse"
 version = "0.1.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
+authors = ["jh05013"]
 edition = "2024"
 include = ["LICENSE-APACHE", "LICENSE-MIT", "**/*.rs", "Cargo.toml"]
 rust-version = "1.85"
@@ -11,19 +11,23 @@ all-features = true
 targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
 
 [dependencies]
-egui = "0.32"
-eframe = { version = "0.32", default-features = false, features = [
-    "accesskit",     # Make egui compatible with screen readers. NOTE: adds a lot of dependencies.
-    "default_fonts", # Embed the default egui fonts.
+egui = "0.32.3"
+eframe = { version = "0.32.3", default-features = false, features = [
+    #"accesskit",     # Make egui compatible with screen readers. NOTE: adds a lot of dependencies.
     "glow",          # Use the glow rendering backend. Alternative: "wgpu".
-    "persistence",   # Enable restoring app state when restarting the app.
+    #"persistence",   # Enable restoring app state when restarting the app.
     "wayland",       # To support Linux (and CI)
     "x11",           # To support older Linux distributions (restores one of the default features)
 ] }
 log = "0.4.27"
+strum = "0.27.2"
+strum_macros = "0.27.2"
+emojis = "0.7.2"
+
+#egui_extras = { version = "0.32.3", features = ["svg"] }
 
 # You only need serde if you want app persistence:
-serde = { version = "1.0.219", features = ["derive"] }
+#serde = { version = "1.0.219", features = ["derive"] }
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -39,7 +43,7 @@ opt-level = 2 # fast and small wasm
 
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]
-opt-level = 2
+#opt-level = 2
 
 
 [patch.crates-io]
@@ -136,7 +140,7 @@ iter_on_single_items = "warn"
 iter_over_hash_type = "warn"
 iter_without_into_iter = "warn"
 large_digit_groups = "warn"
-large_include_file = "warn"
+#large_include_file = "warn"
 large_stack_arrays = "warn"
 large_stack_frames = "warn"
 large_types_passed_by_value = "warn"
@@ -158,7 +162,6 @@ manual_string_new = "warn"
 map_err_ignore = "warn"
 map_flatten = "warn"
 match_bool = "warn"
-match_on_vec_items = "warn"
 match_same_arms = "warn"
 match_wild_err_arm = "warn"
 match_wildcard_for_single_variants = "warn"
@@ -228,7 +231,7 @@ unused_peekable = "warn"
 unused_rounding = "warn"
 unused_self = "warn"
 unused_trait_names = "warn"
-unwrap_used = "warn"
+#unwrap_used = "warn"
 use_self = "warn"
 useless_transmute = "warn"
 verbose_file_reads = "warn"
